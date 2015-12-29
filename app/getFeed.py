@@ -24,10 +24,10 @@ def get_image_from_source(base_url):
 	response = requests.get(base_url).text
 	parsed_html = BeautifulSoup(response,'html.parser')
 	image_tags	= parsed_html.find('img')
-
-	if 'class' in image_tags and 'responsive-img' in image_tags['class']:
+        
+        if 'class' in image_tags.attrs and 'responsive-img' in image_tags.attrs['class']:
 		result = image_tags['src']
-	return result
+        return result
 
 def extract_image(news_record,source):
 

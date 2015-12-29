@@ -30,7 +30,7 @@ def index():
     cursor.execute(sql_query)
     cluster_records = cursor.fetchall()
 
-    json_object		= []
+    json_object		= {'status':'OK','result':[]}
     for record in cluster_records:
     	news_object = []
     	tokens 		= record[0].split(",")[:NEWS_LIMIT]
@@ -46,9 +46,13 @@ def index():
 	    		news_record['title']= record[3]
 	    		news_record['href']	= record[4]
 	    		news_record['image']= record[5]
-	    		news_object.append(news_record)
+	    		
+                        if news_record['source'] == 'guardian' and '' != news_record['image']:
+                            news_object.insert(0,news_record)
+                        else:
+                            news_object.append(news_record)
 
-    	json_object.append(news_object)
+    	json_object['result'].append(news_object)
 
     return make_response(json.dumps(json_object))
 # launch

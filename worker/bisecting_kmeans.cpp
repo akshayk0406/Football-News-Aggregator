@@ -289,6 +289,8 @@ int main(int argc,char **argv)
 	{
 		vector<int> required_idx					= getRequiredPartition(result);
 		pair< vector<int> , vector<int> > partition = bisectingKMeans(input,required_idx);
+		assert(partition.first.size()>0);
+		assert(partition.second.size()>0);
 		result.push_back(partition.first);
 		result.push_back(partition.second);
 	}	
@@ -308,7 +310,7 @@ int main(int argc,char **argv)
 		sort(cluster_doc.begin(),cluster_doc.end());
 		reverse(cluster_doc.begin(),cluster_doc.end());
 
-		fprintf(fp,"%.6f",cluster_score[i].first);
+		fprintf(fp,"%.6f ",cluster_score[i].first);
 		for(int j=0;j<cluster_doc.size();j++) fprintf(fp,"%d ",input.documentid[cluster_doc[j].second]);
 		fprintf(fp,"\n");
 	}

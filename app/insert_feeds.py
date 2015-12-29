@@ -3,7 +3,7 @@ import datetime
 import sys
 
 format = "%Y-%m-%d %H:%M:%S"
-conn_string = "host='localhost' dbname='news' user='akshaykulkarni' password=''"
+conn_string = "host='127.0.0.1' dbname='news' user='don' password='$g3WE28%H3'"
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
 

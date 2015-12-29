@@ -260,10 +260,18 @@ float cluster_membership(struct csr &input,vector<float> &centroid,int member)
 	return score;
 }
 
+void sortInputFile(char *fname)
+{
+	char buf[256];
+	sprintf(buf,"sort -n -k1 -k2 %s -o %s",fname,fname);
+	system(buf);
+}
+
 int main(int argc,char **argv)
 {
-	char solution_file[] = "../data/clustering_solution.txt";
+	char solution_file[] = "/var/www/Football-News-Aggregator/data/clustering_solution.txt";
 	struct csr input;
+	sortInputFile(argv[1]);
 	pair<int,pair<int,int> > input_meta_data = readMetaData(argv[1]);
 	
 	input.documentidx.resize(input_meta_data.first+1,0);

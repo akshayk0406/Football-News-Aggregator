@@ -7,7 +7,7 @@ import psycopg2
 app = Flask(__name__)
 
 app.config.update(
-    DEBUG = True,
+    DEBUG = False,
 )
 
 ARTICLE_LIMIT = 12

@@ -41,18 +41,29 @@ def index():
 
 	    	for record in records:
 	    		news_record = {}
-                        news_record['source']   = record[2]
+                news_record['source']   = record[2]
 	    		news_record['fid'] 	= record[1]
 	    		news_record['title']= record[3]
 	    		news_record['href']	= record[4]
 	    		news_record['image']= record[5]
 	    		
-                        if news_record['source'] == 'guardian' and '' != news_record['image']:
-                            news_object.insert(0,news_record)
-                        else:
-                            news_object.append(news_record)
+                if news_record['source'] == 'guardian' and '' != news_record['image']:
+                    news_object.insert(0,news_record)
+                else:
+                    news_object.append(news_record)
 
-    	json_object['result'].append(news_object)
+        modified_news_object = {}
+        if len(news_object) > 0:
+        	modified_news_object['source'] = news_object[0]['source']
+        	modified_news_object['title'] = news_object[0]['source']
+        	modified_news_object['href'] = news_object[0]['source']
+        	modified_news_object['image'] = news_object[0]['source']
+        	modified_news_object['other'] = []
+
+        	for i in range(1,len(news_object)):
+        		modified_news_object['other'].append({'href':news_object[i]['href'],'title':news_object[i]['title']})
+
+    	json_object['result'].append(modified_news_object)
 
     return make_response(json.dumps(json_object))
 # launch

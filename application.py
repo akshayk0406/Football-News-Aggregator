@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, send_from_directory, request
+import json
 
 # initialization
 app = Flask(__name__)
@@ -8,7 +9,10 @@ app.config.update(
     DEBUG = True,
 )
 
-# controllers
+ARTICLE_LIMIT = 12
+conn_string = "host='localhost' dbname='news' user='akshaykulkarni' password=''"
+conn = psycopg2.connect(conn_string)
+cursor = conn.cursor()
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -20,8 +24,31 @@ def favicon():
 
 @app.route("/")
 def index():
-    return 'Hello World' 
+    sql_query 		= "select cluster_id from football_news.clusters order by created_date,score desc limit " + str(ARTICLE_LIMIT)
+    cursor.execute(sql_query)
+    cluster_records = cursor.fetchall()
 
+    json_object		= []
+    for record in cluster_records:
+    	
+    	news_object = []
+    	tokens 		= record[0].split(",")
+    	for token in tokens:
+	    	sql_query	= "select id,fid,title,href,image from football_news.news where id in (" + str(token) + ")"
+	    	cursor.execute(sql_query)
+	    	records 	= cursor.fetchall()
+
+	    	for record in records:
+	    		news_record = {}
+	    		news_record['fid'] 	= record[1]
+	    		news_record['title']= record[2]
+	    		news_record['href']	= record[3]
+	    		news_record['image']= record[4]
+	    		news_object.append(news_record)
+
+    	json_object.append(news_object)
+
+    return make_response(json.dumps(json_object))
 # launch
 if __name__ == "__main__":
     app.run()

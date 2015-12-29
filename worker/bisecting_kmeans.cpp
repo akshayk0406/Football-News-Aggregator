@@ -296,8 +296,7 @@ int main(int argc,char **argv)
 	vector< pair<float,int> > cluster_score;
 	for(int i=0;i<result.size();i++) cluster_score.push_back(make_pair(objective_function(input,result[i]),i)); 
 	sort(cluster_score.begin(),cluster_score.end());
-	reverse(cluster_score.begin(),cluster_score.end());
-
+	
 	FILE *fp = fopen(solution_file,"w");
 	for(int i=0;i<cluster_score.size();i++)
 	{

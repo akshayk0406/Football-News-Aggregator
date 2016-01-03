@@ -1,3 +1,7 @@
+"""
+Fetches recent news, cleans it and writes clean data to a file which clustering algorithm reads and clusters the data
+"""
+
 from query_util import *
 from util import *
 from db import get_db_connection

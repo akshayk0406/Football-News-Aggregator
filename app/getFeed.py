@@ -1,9 +1,13 @@
+"""
+Gets Response from feeds and records the feed meta-data in database
+"""
+
 import feedparser
 from db import get_db_connection
 from query_util import *
 from util import *
 
-HASH_KEY			= "D#5@BDW!swr7%"
+
 football_sources	= { 'sky':'http://www.skysports.com/rss/0,20514,11095,00.xml',
 						'bbc':'http://feeds.bbci.co.uk/sport/0/football/rss.xml',
 						'dailymail':'http://www.dailymail.co.uk/sport/football/index.rss',

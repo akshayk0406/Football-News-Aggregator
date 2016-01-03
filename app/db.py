@@ -1,3 +1,7 @@
+"""
+Utility file to manage db connection
+"""
+
 from config import g_useProduction
 import psycopg2
 

@@ -1,13 +1,16 @@
-import psycopg2
+"""
+File to write clustering to database
+"""
+
 import datetime
 import sys
+from db import get_db_connection
 
-format = "%Y-%m-%d %H:%M:%S"
-conn_string = "host='127.0.0.1' dbname='news' user='don' password='$g3WE28%H3'"
-conn = psycopg2.connect(conn_string)
-cursor = conn.cursor()
+format              = "%Y-%m-%d %H:%M:%S"
+conn                = get_db_connection()
+cursor              = conn.cursor()
+solution_file       = sys.argv[1]
 
-solution_file = sys.argv[1]
 with open(solution_file,'r') as f:
     for line in f:
 
@@ -21,6 +24,8 @@ with open(solution_file,'r') as f:
 
         ctime = datetime.datetime.strftime(datetime.datetime.utcnow(),format)
         sql_query = "insert into football_news.clusters(cluster_id,score,created_date) values ('"+ cluster_str + "',"+ str(score) +",'"+ ctime +"')"
-        cursor.execute(sql_query)
+        insert(cursor,sql_query)
         conn.commit()
 
+cursor.close()
+conn.close()

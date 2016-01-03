@@ -5,6 +5,7 @@ import hashlib
 import feedparser
 import requests
 from bs4 import BeautifulSoup
+from db import get_db_connection
 
 HASH_KEY			= "D#5@BDW!swr7%"
 football_sources	= { 'sky':'http://www.skysports.com/rss/0,20514,11095,00.xml',
@@ -118,8 +119,7 @@ def record_news(cursor,news_object):
 
 	cursor.execute(sql_query)
 
-conn_string = "host='127.0.0.1' dbname='news' user='don' password='$g3WE28%H3'"
-conn = psycopg2.connect(conn_string)
+conn   = get_db_connection()
 cursor = conn.cursor()
 
 news = []
@@ -143,3 +143,6 @@ for k,v in football_sources.items():
 for news_item in news:
 	record_news(cursor,news_item)
 conn.commit()
+
+cursor.close()
+conn.close()

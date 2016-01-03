@@ -8,8 +8,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 from nltk.stem.porter import *
 
-conn_string = "host='127.0.0.1' dbname='news' user='don' password='$g3WE28%H3'"
-conn = psycopg2.connect(conn_string)
+conn   = get_db_connection()
 cursor = conn.cursor()
 
 day_limit	= 1

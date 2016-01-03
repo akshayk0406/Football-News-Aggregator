@@ -36,3 +36,11 @@ def get_db_connection():
 
 	conn = psycopg2.connect(conn_string)
 	return conn
+
+def select(cursor,sql_query):
+	cursor.execute(sql_query)
+	return cursor.fetchall()
+
+def insert(cursor,sql_query):
+	cursor.execute(sql_query)
+	return

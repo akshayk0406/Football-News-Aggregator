@@ -48,6 +48,7 @@ public class NewsArrayAdapterItem extends ArrayAdapter<NewsNode>
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                footyUtils.log(objectItem.newsId);
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(objectItem.href));
                 mContext.startActivity(browserIntent);
             }

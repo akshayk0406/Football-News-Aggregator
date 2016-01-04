@@ -38,10 +38,11 @@ public class MainActivity extends AppCompatActivity {
 
                     for (int i = 0; i < totalNewsItem; i++) {
                         JSONObject newsItem = result.getJSONObject(i);
-                        String source = newsItem.getString("source");
-                        String image = newsItem.getString("image");
-                        String href = newsItem.getString("href");
-                        String title = newsItem.getString("title");
+                        int newsId      = newsItem.getInt("id");
+                        String source   = newsItem.getString("source");
+                        String image    = newsItem.getString("image");
+                        String href     = newsItem.getString("href");
+                        String title    = newsItem.getString("title");
                         JSONArray similar = newsItem.getJSONArray("other");
 
                         ArrayList other = new ArrayList();
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                             Pair newsPair = new Pair<>(newsObject.getString("href"), newsObject.getString("title"));
                             other.add(newsPair);
                         }
-                        allNews[i] = new NewsNode(title, image, href, source, other);
+                        allNews[i] = new NewsNode(newsId,title, image, href, source, other);
                     }
                     loadNews(allNews);
                 } catch (JSONException e) {

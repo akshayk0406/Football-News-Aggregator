@@ -26,7 +26,7 @@ def get_latest_news(cursor):
 
 def get_recent_data(cursor):
 	day_limit		= 1
-	start_time  	= (datetime.datetime.utcnow() - datetime.timedelta(days=hours_limit)).strftime("%Y-%m-%d %H:%M:%S")
+	start_time  	= (datetime.datetime.utcnow() - datetime.timedelta(days=day_limit)).strftime("%Y-%m-%d %H:%M:%S")
 	sql_query		= "select news_id,ipaddress from football_news.log where created_date >= '" + start_time + "' order by created_date desc,ipaddress asc,news_id asc"
 
 	records 		= select(cursor,sql_query)

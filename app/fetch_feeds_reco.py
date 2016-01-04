@@ -16,8 +16,8 @@ cursor.close()
 conn.close()
 
 user_data 			= {}
-for user_activity in user_data:
-	ipaddress		= user_activity['ipaddress']
+for user_activity in result:
+        ipaddress		= user_activity['ipaddress']
 	news_id			= user_activity['news_id']
 	
 	if ipaddress not in user_data:
@@ -25,7 +25,7 @@ for user_activity in user_data:
 
 	user_data[ipaddress].append(news_id)
 
-with open(output_file,'w') as f:
-	for ipaddress,articles:
-		for news_id in articles:
-			f.write(ipaddress+","+str(news_id)+"\n")
+"""
+Implementing collabrative engine
+"""
+

@@ -93,4 +93,8 @@ def log_views():
     cursor.close()
     conn.close()
 
-    return make_response(json.dumps({'status':'OK'})
+    return make_response(json.dumps{'status':'OK'})
+
+if __name__ == "__main__":
+    app.run()
+

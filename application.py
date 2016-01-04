@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template, send_from_directory, request,make_response
 import json
 import psycopg2
-from app.db import get_db_connection,select
+from app.db import get_db_connection,select,insert
 from app.config import g_post_hash_key
 from app.util import md5_hash
 import datetime
@@ -42,13 +42,13 @@ def index():
 	    	records 	= select(cursor,sql_query)
 
 	    	for record in records:
-	    		news_record = {}
+	    		news_record             = {}
                 news_record['id']       = record[0]
-	    		news_record['source']   = record[2]
-	    		news_record['fid'] 	    = record[1]
-	    		news_record['title']    = record[3]
-	    		news_record['href']	    = record[4]
-	    		news_record['image']    = record[5]
+                news_record['fid'] 	    = record[1]
+                news_record['source']   = record[2]
+                news_record['title']    = record[3]
+                news_record['href']	    = record[4]
+                news_record['image']    = record[5]
 	    		
                 if news_record['source'] == 'guardian' and '' != news_record['image']:
                     news_object.insert(0,news_record)
@@ -57,17 +57,17 @@ def index():
 
         modified_news_object = {}
         if len(news_object) > 0:
-        	modified_news_object['source'] = news_object[0]['source']
-        	modified_news_object['title']  = news_object[0]['title']
-        	modified_news_object['href']   = news_object[0]['href']
-        	modified_news_object['image']  = news_object[0]['image']
+            modified_news_object['source'] = news_object[0]['source']
+            modified_news_object['title']  = news_object[0]['title']
+            modified_news_object['href']   = news_object[0]['href']
+            modified_news_object['image']  = news_object[0]['image']
             modified_news_object['id']     = news_object[0]['id']
-        	modified_news_object['other']  = []
+            modified_news_object['other']  = []
 
-        	for i in range(1,len(news_object)):
-        		modified_news_object['other'].append({'href':news_object[i]['href'],'title':news_object[i]['title'],'id':news_object[i]['id']})
+            for i in range(1,len(news_object)):
+                modified_news_object['other'].append({'href':news_object[i]['href'],'title':news_object[i]['title'],'id':news_object[i]['id']})
 
-    	json_object['result'].append(modified_news_object)
+        json_object['result'].append(modified_news_object)
 
     cursor.close()
     conn.close()
@@ -76,15 +76,15 @@ def index():
 
 @app.route("/log",methods=["POST"])
 def log_views():
-    news_id     = request.form['id'] if 'id' in form else 0
-    client_hash = request.form['hash'] if 'hash' in form else ''
+    news_id     = request.form['id'] if 'id' in request.form else 0
+    client_hash = request.form['hash'] if 'hash' in request.form else ''
     server_hash = md5_hash(str(news_id)+g_post_hash_key)
 
     if client_hash != server_hash:
         return make_response(json.dumps({'status':'FAIL','message':'Hash MisMatch'}))
 
-    conn            = get_db_connection()
-    cursor          = conn.cursor()
+    conn        = get_db_connection()
+    cursor      = conn.cursor()
 
     format      = "%Y-%m-%d %H:%M:%S"
     ipaddress   = request.remote_addr
@@ -92,6 +92,7 @@ def log_views():
     sql_query   = "insert into football_news.log(news_id,ipaddress,created_date) values ("+str(news_id) +",'"+ipaddress+"','"+ ctime +"')"
     insert(cursor,sql_query)
 
+    conn.commit()
     cursor.close()
     conn.close()
 

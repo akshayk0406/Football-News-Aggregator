@@ -94,8 +94,3 @@ def log_views():
     conn.close()
 
     return make_response(json.dumps({'status':'OK'})
-
-# launch
-if __name__ == "__main__":
-    app.run()
-

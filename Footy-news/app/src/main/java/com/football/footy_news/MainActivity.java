@@ -8,17 +8,59 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import android.util.Pair;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        RestClient.get("", null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    JSONArray result = response.getJSONArray("result");
+                    int totalNewsItem = result.length();
+                    NewsNode[] allNews = new NewsNode[totalNewsItem];
 
+                    for (int i = 0; i < totalNewsItem; i++) {
+                        JSONObject newsItem = result.getJSONObject(i);
+                        String source = newsItem.getString("source");
+                        String image = newsItem.getString("image");
+                        String href = newsItem.getString("href");
+                        String title = newsItem.getString("title");
+                        JSONArray similar = newsItem.getJSONArray("other");
+
+                        ArrayList other = new ArrayList();
+                        for (int j = 0; j < similar.length(); j++) {
+                            JSONObject newsObject = similar.getJSONObject(j);
+                            Pair newsPair = new Pair<>(newsObject.getString("href"), newsObject.getString("title"));
+                            other.add(newsPair);
+                        }
+                        allNews[i] = new NewsNode(title, image, href, source, other);
+                    }
+                    loadNews(allNews);
+                } catch (JSONException e) {
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+            }
+        });
     }
 
     @Override
@@ -41,5 +83,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadNews(NewsNode [] news)
+    {
+        NewsArrayAdapterItem adapter    = new NewsArrayAdapterItem(this, R.layout.news_node, news);
+        ListView listViewViewItems      = (ListView) findViewById(R.id.newsListView);
+        listViewViewItems.setAdapter(adapter);
     }
 }

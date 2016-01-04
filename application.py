@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, send_from_directory, request,make_response
 import json
 import psycopg2
+from app.db import get_db_connection,select
 
 # initialization
 app = Flask(__name__)
@@ -25,26 +26,24 @@ def favicon():
 
 @app.route("/")
 def index():
-    sql_query 		= "select cluster_id from football_news.clusters order by created_date,score desc limit " + str(ARTICLE_LIMIT)
-    cursor.execute(sql_query)
-    cluster_records = cursor.fetchall()
+    sql_query 		= "select components from football_news.clusters order by created_date,score desc limit " + str(ARTICLE_LIMIT)
+    cluster_records     = select(cursor,sql_query)
 
     json_object		= {'status':'OK','result':[]}
     for record in cluster_records:
-    	news_object = []
+    	news_object     = []
     	tokens 		= record[0].split(",")[:NEWS_LIMIT]
     	for token in tokens:
 	    	sql_query	= "select id,fid,source,title,href,image from football_news.news where id in (" + str(token) + ")"
-	    	cursor.execute(sql_query)
-	    	records 	= cursor.fetchall()
+	    	records 	= select(cursor,sql_query)
 
 	    	for record in records:
 	    		news_record = {}
 	    		news_record['source']   = record[2]
 	    		news_record['fid'] 	= record[1]
-	    		news_record['title']= record[3]
+	    		news_record['title']    = record[3]
 	    		news_record['href']	= record[4]
-	    		news_record['image']= record[5]
+	    		news_record['image']    = record[5]
 	    		
                 if news_record['source'] == 'guardian' and '' != news_record['image']:
                     news_object.insert(0,news_record)

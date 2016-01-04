@@ -22,10 +22,14 @@ for k,v in football_sources.items():
 	feed = feedparser.parse( v )
 	if 'entries' in feed:
 		for record in feed['entries']:
-
+                        
+                        should_process  = True
 			for unwanted_key_words in g_unwanted_key_words:
 				if record['title'].lower().find(unwanted_key_words) >= 0:
-					continue
+                                        should_process = False
+                    
+                        if not should_process:
+                            continue
 
 			if 'id' not in record:
 				record['id'] = record['link']

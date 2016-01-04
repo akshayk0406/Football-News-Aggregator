@@ -50,8 +50,11 @@ def clean_text(token,stop,stemmer):
 Generating article-Id 
 """
 def generate_articleId(source,document_id):
+	return md5_hash(source+ g_hash_key + document_id)
+	
+def md5_hash(input_str):
 	m = hashlib.md5()
-	m.update(source+ g_hash_key + document_id)
+	m.update(input_str)
 	return m.hexdigest()
 
 """

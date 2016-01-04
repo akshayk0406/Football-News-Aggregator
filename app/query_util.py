@@ -1,4 +1,3 @@
-
 import datetime
 from db import select,insert
 from util import *
@@ -33,6 +32,17 @@ def is_record_present(cursor,fid):
 
 	for record in records:
 		total_records = total_records + 1
+
+	return total_records > 0
+
+def is_clusterting_present(cursor,cluster_id):
+
+	sql_query		= "select cluster_id from football_news.clusters where cluster_id = '" + cluster_id + "'"
+	records 		= select(cursor,sql_query)
+	total_records	= 0
+
+	for record in records:
+		total_records	= total_records + 1
 
 	return total_records > 0
 

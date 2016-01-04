@@ -6,7 +6,7 @@ import feedparser
 from db import get_db_connection
 from query_util import *
 from util import *
-
+from config import g_unwanted_key_words
 
 football_sources	= { 'sky':'http://www.skysports.com/rss/0,20514,11095,00.xml',
 						'bbc':'http://feeds.bbci.co.uk/sport/0/football/rss.xml',
@@ -22,6 +22,10 @@ for k,v in football_sources.items():
 	feed = feedparser.parse( v )
 	if 'entries' in feed:
 		for record in feed['entries']:
+
+			for unwanted_key_words in g_unwanted_key_words:
+				if record['title'].lower().find(unwanted_key_words) >= 0:
+					continue
 
 			if 'id' not in record:
 				record['id'] = record['link']

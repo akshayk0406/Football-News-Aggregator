@@ -1,3 +1,24 @@
+/*
+############ Author: Akshay Kulkarni ####################
+*/
+
+/*
+Bisecting Kmeans
+
+- Takes input file in format documentid featureid frequency
+- Computes Tf-idf score for each term
+- Input space is normalized
+- Bisecting K-means is used to obtain clusters
+	* Numbers of clusters as of now are fixed as (#No of documents * #No of features)/#No of Non-zeros
+	* Why Bisecting Kmeans=> http://glaros.dtc.umn.edu/gkhome/fetch/papers/docclusterKDDTMW00.pdf
+- Clustering solution is written in following format
+	* Score component_1,component_2,....,component_n
+	where Score is clustering score(I2) for that cluster and componens are document that forms part of the cluster. 
+	Components in Clusters are mentioned in increasing order of their significance
+	* Also, cluster whose score is least is written first and cluster with maximum score is written last
+	For I2 - refer => http://glaros.dtc.umn.edu/gkhome/fetch/papers/vsclusterTR01.pdf
+*/
+
 #include<cstdio>
 #include<cmath>
 #include<algorithm>
@@ -9,9 +30,10 @@
 #include<cassert>
 
 #define MAX_ITERATIONS 100
+#define CLUSTERS_TO_OUTPUT 4
 using namespace std;
 
-struct csr
+struct csr //struct to store input data in CSR format. This format is preferred as it only stores non-values
 {
 	vector<int> 	documentidx;
 	vector<int> 	documentid;
@@ -20,6 +42,9 @@ struct csr
 	int dim;
 };
 
+/*
+Function to read Meta-Data like #Documents, #Features, #Non-Zeros for clustering
+*/
 pair<int,pair<int,int> > readMetaData(char *fname)
 {
 	//Number of documents, max-featureid , non-zeros
@@ -48,6 +73,9 @@ pair<int,pair<int,int> > readMetaData(char *fname)
 	return result;
 }
 
+/*
+Function that actually reads the data and stores in CSR format
+*/
 void readData(char *fname,struct csr &input)
 {
 	FILE *fp = fopen(fname,"r");
@@ -77,6 +105,10 @@ void readData(char *fname,struct csr &input)
 	input.documentidx[rowptr]			= colptr;
 }
 
+/*
+Function to pickup cluster for splitting. In Bisecting K-means we require to select a cluster at every step that need to be split.
+Here, I have used the criteria that cluster with maximum size will be used for further splitting
+*/
 vector<int> getRequiredPartition(vector< vector<int> > &result)
 {
 	int max_size	= 0;
@@ -95,6 +127,9 @@ vector<int> getRequiredPartition(vector< vector<int> > &result)
 	return answer;
 }
 
+/*
+Initializing initial cluster-points(seeds)
+*/
 pair<int,int> getinitClusters(int seed,int n)
 {
 	pair<int,int> answer;
@@ -109,6 +144,9 @@ pair<int,int> getinitClusters(int seed,int n)
 	return answer;
 }
 
+/*
+Cluster-Assignment step in which every document is assigned with most similar cluster
+*/
 int clusterAssignment(int iter,struct csr &input,vector<int> &required_idx,vector< float > &c1,vector< float > &c2,vector<int> &assignment)
 {
 	int changes   = 0;
@@ -138,6 +176,9 @@ int clusterAssignment(int iter,struct csr &input,vector<int> &required_idx,vecto
 	return changes;
 }
 
+/*
+Function to normalize the vector. Everything is being in Unit-space
+*/
 void normalizeDense(vector<float> &c)
 {
 	float csum = 0.0;
@@ -146,6 +187,9 @@ void normalizeDense(vector<float> &c)
 	for(int i=0;i<c.size();i++) c[i] = c[i]/csum;
 }
 
+/*
+Based on cluster assignment, centroids are recomputed.
+*/
 void computeCentroids(struct csr &input,vector<int> &required_idx,vector<int> &assignment,vector< float > &c1,vector< float > &c2)
 {
 	c1.resize(input.dim,0.0);
@@ -167,6 +211,9 @@ void computeCentroids(struct csr &input,vector<int> &required_idx,vector<int> &a
 	normalizeDense(c2);
 }
 
+/*
+Entry function which calls other auxillary functions
+*/
 pair< vector<int> , vector<int> > bisectingKMeans(struct csr &input,vector<int> &required_idx)
 {
 	//Get two centroids
@@ -205,6 +252,9 @@ void normalize(struct csr &input)
 	}
 }
 
+/*
+Tf-df transformation
+*/
 void transform(struct csr &input)
 {
 	map<int,int> feature_map;
@@ -260,6 +310,9 @@ float cluster_membership(struct csr &input,vector<float> &centroid,int member)
 	return score;
 }
 
+/*
+sorting the input file based on feature for each document. i.e feature for each document should be in sorted order
+*/
 void sortInputFile(char *fname)
 {
 	char buf[256];
@@ -270,6 +323,7 @@ void sortInputFile(char *fname)
 int main(int argc,char **argv)
 {
 	char solution_file[] = "/var/www/Football-News-Aggregator/data/clustering_solution.txt";
+	//char solution_file[] = "../data/clustering_solution.txt";
 	struct csr input;
 	sortInputFile(argv[1]);
 	pair<int,pair<int,int> > input_meta_data = readMetaData(argv[1]);
@@ -319,7 +373,8 @@ int main(int argc,char **argv)
 		reverse(cluster_doc.begin(),cluster_doc.end());
 
 		fprintf(fp,"%.6f ",cluster_score[i].first);
-		for(int j=0;j<cluster_doc.size();j++) fprintf(fp,"%d ",input.documentid[cluster_doc[j].second]);
+		for(int j=0;j<min(CLUSTERS_TO_OUTPUT,(int)cluster_doc.size());j++) 
+			fprintf(fp,"%d ",input.documentid[cluster_doc[j].second]);
 		fprintf(fp,"\n");
 	}
 	fclose(fp);

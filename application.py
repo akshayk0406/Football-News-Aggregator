@@ -10,11 +10,10 @@ app.config.update(
     DEBUG = False,
 )
 
-ARTICLE_LIMIT = 12
-NEWS_LIMIT = 4
-conn_string = "host='127.0.0.1' dbname='news' user='don' password='$g3WE28%H3'"
-conn = psycopg2.connect(conn_string)
-cursor = conn.cursor()
+ARTICLE_LIMIT   = 12
+NEWS_LIMIT      = 4
+conn            = get_db_connection()
+cursor          = conn.cursor()
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -41,7 +40,7 @@ def index():
 
 	    	for record in records:
 	    		news_record = {}
-                news_record['source']   = record[2]
+	    		news_record['source']   = record[2]
 	    		news_record['fid'] 	= record[1]
 	    		news_record['title']= record[3]
 	    		news_record['href']	= record[4]
@@ -55,9 +54,9 @@ def index():
         modified_news_object = {}
         if len(news_object) > 0:
         	modified_news_object['source'] = news_object[0]['source']
-        	modified_news_object['title'] = news_object[0]['source']
-        	modified_news_object['href'] = news_object[0]['source']
-        	modified_news_object['image'] = news_object[0]['source']
+        	modified_news_object['title'] = news_object[0]['title']
+        	modified_news_object['href'] = news_object[0]['href']
+        	modified_news_object['image'] = news_object[0]['image']
         	modified_news_object['other'] = []
 
         	for i in range(1,len(news_object)):

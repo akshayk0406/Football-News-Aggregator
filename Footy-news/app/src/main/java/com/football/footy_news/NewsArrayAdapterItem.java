@@ -1,6 +1,8 @@
 package com.football.footy_news;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.widget.ArrayAdapter;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,15 @@ public class NewsArrayAdapterItem extends ArrayAdapter<NewsNode>
 
         TextView title                  = (TextView) convertView.findViewById(R.id.title);
         title.setText(objectItem.title);
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(objectItem.href));
+                mContext.startActivity(browserIntent);
+            }
+        });
+
         return convertView;
     }
 }

@@ -24,6 +24,20 @@ def get_latest_news(cursor):
 
 	return result
 
+def get_recent_data(cursor):
+	day_limit		= 1
+	start_time  	= (datetime.datetime.utcnow() - datetime.timedelta(days=hours_limit)).strftime("%Y-%m-%d %H:%M:%S")
+	sql_query		= "select news_id,ipaddress from football_news.log where created_date >= '" + start_time + "' order by created_date desc,ipaddress asc,news_id asc"
+
+	records 		= select(cursor,sql_query)
+	result 			= []
+	for record in records:
+		result_obj	= {}
+		result_obj['news_id'] 	= record[0]
+		result_obj['ipaddress']	= record[1]
+		result.append(result_obj)
+	return result
+
 def is_record_present(cursor,fid):
 
 	sql_query 		= "select fid from football_news.news where fid = '" + fid + "'"

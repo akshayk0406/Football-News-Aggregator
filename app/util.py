@@ -160,3 +160,29 @@ def clean(token):
 	token = token.replace('"','')
 	token = token.replace("'","")
 	return token
+
+"""
+Compute cosing similarity between two sparse vector
+"""
+def compute_similarity(target_news_id,source_news_id):
+
+	csum 		= 0.0
+	itr1		= 0
+	itr2		= 0
+
+	n 			= len(target_news_id)
+	m 			= len(source_news_id)
+
+	while itr1 < n and itr2 < m:
+		if target_news_id[itr1] == source_news_id[itr2]:
+			csum = csum + 1.0
+			itr2 = itr2 + 1
+			itr1 = itr1 + 1
+
+		elif target_news_id[itr1] > source_news_id[itr2]:
+			itr2 = itr2 + 1
+		else:
+			itr1 = itr1 + 1
+
+	csum		 = csum/(1.0*sqrt(n)*sqrt(m))
+	return csum

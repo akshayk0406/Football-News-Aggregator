@@ -2,13 +2,15 @@
 Constructing data-sets for offline recommendation
 """
 
+from config import g_reco_article_limit
 from query_util import *
 from util import *
-from db import get_db_connection
+from db import get_db_connection,insert
 from util import *
 import sys
+import datetime
 
-output_file			= sys.argv[1]
+dt_format               = "%Y-%m-%d %H:%M:%S"
 conn            	= get_db_connection()
 cursor          	= conn.cursor()
 result		    	= get_recent_data(cursor)
@@ -32,7 +34,9 @@ recommendations		= {}
 neighbors			= 10
 recommend_news		= {}
 for target_user,target_news_id in user_data.iteritems():
-	norm_factor		= sqrt(len(news_id))
+        total_news              = len(target_news_id) 
+	norm_factor		= total_news ** 0.5
+        nearest_user            = []
 	for search_user,source_news_id in user_data.iteritems():
 		if search_user == target_user:
 			continue
@@ -44,17 +48,20 @@ for target_user,target_news_id in user_data.iteritems():
 	nearest_user 		= nearest_user[:neighbors]
 	required_articles	= []
 
-	for user in nearest_user:
+	for similarity,user in nearest_user:
 		for news_article in user_data[user]:
 			if news_article not in target_news_id and news_article not in required_articles:
 				required_articles.append(news_article)
 
-	recommendations[target_user] = required_articles
+	recommendations[target_user] = required_articles[:g_reco_article_limit]
 
-with open(output_file,'w') as f:
-	for user,articles in recommendations.iteritems():
-		f.write(user+ " ")
-		for news_id in articles:
-			f.write(str(news_id) + " ")
-		f.write("\n")
+conn            = get_db_connection()
+cursor          = conn.cursor()
 
+for user,articles in recommendations.iteritems():
+    components  = ",".join([str(news) for news in articles])
+    ctime       = datetime.datetime.strftime(datetime.datetime.utcnow(),dt_format)
+    sql_query   = "insert into football_news.recommendation(ipaddress,components,created_date) values ('"+str(user)+"','"+str(components)+"','"+ctime+"')"
+    insert(cursor,sql_query)
+    conn.commit()
+    

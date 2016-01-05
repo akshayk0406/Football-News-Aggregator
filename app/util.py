@@ -184,5 +184,5 @@ def compute_similarity(target_news_id,source_news_id):
 		else:
 			itr1 = itr1 + 1
 
-	csum		 = csum/(1.0*sqrt(n)*sqrt(m))
+	csum		 = csum/(1.0*(n**0.5)*(m**0.5))
 	return csum

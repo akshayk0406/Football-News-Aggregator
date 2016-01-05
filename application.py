@@ -30,7 +30,7 @@ def favicon():
 def index():
     conn            = get_db_connection()
     cursor          = conn.cursor()
-    sql_query 		= "select components from football_news.clusters order by created_date,score desc limit " + str(ARTICLE_LIMIT)
+    sql_query 		= "select components from football_news.clusters order by created_date desc,score desc limit " + str(ARTICLE_LIMIT)
     cluster_records = select(cursor,sql_query)
 
     json_object		= {'status':'OK','result':[]}

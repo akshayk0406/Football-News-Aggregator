@@ -80,7 +80,9 @@ def get_reco():
     
     reco_news_tokens    = reco_news.split(",")
     for reco_news in reco_news_tokens:
-        response['result'].append(construct_news_from_id(cursor,reco_news))
+        news_object             = construct_news_from_id(cursor,reco_news)
+        news_object['other']    = []
+        response['result'].append(news_object)
 
     if 0 == len(response['result']):
         response['result']  = get_landing_page_data(cursor)

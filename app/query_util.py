@@ -71,3 +71,41 @@ def record_news(cursor,news_object):
 	sql_query				= sql_query + "'"+news_object['href'] +"','"+news_object['title']+"','"+news_object['image']+"',"
 	sql_query				= sql_query + "'"+news_object['created_date']+"');"
 	insert(cursor,sql_query)
+
+def get_landing_page_data(cursor):
+
+	answer 			= []
+	sql_query 		= "select components from football_news.clusters order by created_date desc,score desc limit " + str(ARTICLE_LIMIT)
+    cluster_records = select(cursor,sql_query)
+
+    for record in cluster_records:
+    	tokens 		= record[0].split(",")[:g_cluster_news_limit]
+    	news_object = []
+
+    	for token in tokens:
+    		news_object.append(construct_news_from_id(cursor,token))
+
+        modified_news_object = get_modifed_news_object(news_object)
+        answer.append(modified_news_object)
+
+    return answer
+
+def construct_news_from_id(cursor,token):
+
+	news_object 	= []
+	sql_query		= "select id,fid,source,title,href,image from football_news.news where id in (" + str(token) + ")"
+	records 		= select(cursor,sql_query)
+
+	for record in records:
+		news_object.append(get_news_object(record))
+
+    return news_object
+
+def get_recommended_items(cursor,ipaddress):
+	sql_query   = "select components from football_news.recommendation where ipaddress ='"+str(ipaddress) + "'"
+	return select(cursor,sql_query)
+
+def push_log(cursor,news_id,ipaddress,ctime):
+
+	sql_query   = "insert into football_news.log(news_id,ipaddress,created_date) values ("+str(news_id) +",'"+ipaddress+"','"+ ctime +"')"
+    insert(cursor,sql_query)

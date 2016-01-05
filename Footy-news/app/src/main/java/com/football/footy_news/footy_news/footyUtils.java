@@ -3,13 +3,18 @@ package com.football.footy_news.footy_news;
 /**
  * Created by akshaykulkarni on 1/4/16.
  */
+import android.util.Pair;
+
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
+import java.util.ArrayList;
 
 public class footyUtils {
     private static footyUtils ourInstance   = new footyUtils();
@@ -66,5 +71,38 @@ public class footyUtils {
             }
 
         });
+    }
+
+    public static NewsNode [] constructNews(JSONObject response)
+    {
+        NewsNode[] allNews = null;
+        try
+        {
+            JSONArray result    = response.getJSONArray("result");
+            int totalNewsItem   = result.length();
+            allNews             = new NewsNode[totalNewsItem];
+
+            for (int i = 0; i < totalNewsItem; i++) {
+                JSONObject newsItem = result.getJSONObject(i);
+                int newsId          = newsItem.getInt("id");
+                String source       = newsItem.getString("source");
+                String image        = newsItem.getString("image");
+                String href         = newsItem.getString("href");
+                String title        = newsItem.getString("title");
+                JSONArray similar   = newsItem.getJSONArray("other");
+
+                ArrayList other = new ArrayList();
+                for (int j = 0; j < similar.length(); j++) {
+                    JSONObject newsObject = similar.getJSONObject(j);
+                    Pair newsPair = new Pair<>(newsObject.getString("href"), newsObject.getString("title"));
+                    other.add(newsPair);
+                }
+                allNews[i] = new NewsNode(newsId, title, image, href, source, other);
+            }
+        }
+        catch (JSONException e)
+        {
+        }
+        return allNews;
     }
 }

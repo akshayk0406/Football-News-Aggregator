@@ -186,3 +186,31 @@ def compute_similarity(target_news_id,source_news_id):
 
 	csum		 = csum/(1.0*(n**0.5)*(m**0.5))
 	return csum
+
+def get_news_object(record):
+
+	news_record				= {}
+	news_record['id']       = record[0]
+    news_record['fid'] 	    = record[1]
+    news_record['source']   = record[2]
+    news_record['title']    = record[3]
+    news_record['href']	    = record[4]
+    news_record['image']    = record[5]
+
+    return news_record
+
+def get_modifed_news_object(news_object):
+	
+	modified_news_object = {}
+    if len(news_object) > 0:
+        modified_news_object['source'] = news_object[0]['source']
+        modified_news_object['title']  = news_object[0]['title']
+        modified_news_object['href']   = news_object[0]['href']
+        modified_news_object['image']  = news_object[0]['image']
+        modified_news_object['id']     = news_object[0]['id']
+        modified_news_object['other']  = []
+
+        for i in range(1,len(news_object)):
+                modified_news_object['other'].append({'href':news_object[i]['href'],'title':news_object[i]['title'],'id':news_object[i]['id']})
+
+    return modified_news_object

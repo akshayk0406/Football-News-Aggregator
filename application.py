@@ -3,8 +3,9 @@ from flask import Flask, render_template, send_from_directory, request,make_resp
 import json
 import psycopg2
 from app.db import get_db_connection,select,insert
-from app.config import g_post_hash_key
-from app.util import md5_hash
+from app.config import g_post_hash_key,g_cluster_news_limit,g_dtformat
+from app.util import md5_hash,get_news_object
+from app.query_util import get_landing_page_data,push_log,construct_news_from_id,get_recommended_items
 import datetime
 
 # initialization
@@ -13,10 +14,6 @@ app = Flask(__name__)
 app.config.update(
     DEBUG = False,
 )
-
-ARTICLE_LIMIT   = 12
-NEWS_LIMIT      = 4
-
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -28,46 +25,11 @@ def favicon():
 
 @app.route("/",methods=["GET"])
 def index():
-    conn            = get_db_connection()
-    cursor          = conn.cursor()
-    sql_query 		= "select components from football_news.clusters order by created_date desc,score desc limit " + str(ARTICLE_LIMIT)
-    cluster_records = select(cursor,sql_query)
 
-    json_object		= {'status':'OK','result':[]}
-    for record in cluster_records:
-    	news_object     = []
-    	tokens 		= record[0].split(",")[:NEWS_LIMIT]
-    	for token in tokens:
-	    	sql_query	= "select id,fid,source,title,href,image from football_news.news where id in (" + str(token) + ")"
-	    	records 	= select(cursor,sql_query)
-
-	    	for record in records:
-	    		news_record             = {}
-                news_record['id']       = record[0]
-                news_record['fid'] 	    = record[1]
-                news_record['source']   = record[2]
-                news_record['title']    = record[3]
-                news_record['href']	    = record[4]
-                news_record['image']    = record[5]
-	    		
-                if news_record['source'] == 'guardian' and '' != news_record['image']:
-                    news_object.insert(0,news_record)
-                else:
-                    news_object.append(news_record)
-
-        modified_news_object = {}
-        if len(news_object) > 0:
-            modified_news_object['source'] = news_object[0]['source']
-            modified_news_object['title']  = news_object[0]['title']
-            modified_news_object['href']   = news_object[0]['href']
-            modified_news_object['image']  = news_object[0]['image']
-            modified_news_object['id']     = news_object[0]['id']
-            modified_news_object['other']  = []
-
-            for i in range(1,len(news_object)):
-                modified_news_object['other'].append({'href':news_object[i]['href'],'title':news_object[i]['title'],'id':news_object[i]['id']})
-
-        json_object['result'].append(modified_news_object)
+    json_object             = {'status':'OK','result':[]}
+    conn                    = get_db_connection()
+    cursor                  = conn.cursor()
+    json_object['result']   = get_landing_page_data(cursor)
 
     cursor.close()
     conn.close()
@@ -85,18 +47,41 @@ def log_views():
 
     conn        = get_db_connection()
     cursor      = conn.cursor()
-
-    format      = "%Y-%m-%d %H:%M:%S"
-    ipaddress   = request.remote_addr
-    ctime       = datetime.datetime.strftime(datetime.datetime.utcnow(),format)
-    sql_query   = "insert into football_news.log(news_id,ipaddress,created_date) values ("+str(news_id) +",'"+ipaddress+"','"+ ctime +"')"
-    insert(cursor,sql_query)
-
+    push_log(cursor,news_id,request.remote_addr,datetime.datetime.strftime(datetime.datetime.utcnow(),g_dtformat))
     conn.commit()
     cursor.close()
     conn.close()
 
     return make_response(json.dumps({'status':'OK'}))
+
+@app.route("/reco",methods=["GET"])
+def get_reco():
+    
+    response    = {'status':'FAIL','message':'NO_RECOMMENDATION','result':[]}
+    ipaddress   = request.remote_addr
+    if '' == ipaddress:
+        return make_response(json.dumps(response))
+
+    conn        = get_db_connection()
+    cursor      = conn.cursor()
+    
+    records     = get_recommended_items(cursor,ipaddress) select(cursor,sql_query)
+    reco_news   = ""
+
+    for record in records:
+        reco_news    = record[0]
+
+    if 0 == len(reco_news.split(",")):
+        cursor.close()
+        conn.close()
+        return make_response(json.dumps(response))
+
+    response            = {'status':'OK','result':[]}
+    response['result']  = construct_news_from_id(cursor,reco_news)
+    cursor.close()
+    conn.close()
+
+    return make_response(json.dumps(response))
 
 if __name__ == "__main__":
     app.run()

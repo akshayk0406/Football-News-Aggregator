@@ -1,10 +1,6 @@
 package com.football.footy_news.footy_news;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,12 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import org.apache.http.Header;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import java.util.ArrayList;
-import android.util.Pair;
 import android.widget.ListView;
+import android.content.Intent;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -43,33 +36,10 @@ public class MainActivity extends AppCompatActivity
 
         RestClient.get("", null, new JsonHttpResponseHandler() {
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                try {
-
-                    JSONArray result = response.getJSONArray("result");
-                    int totalNewsItem = result.length();
-                    NewsNode[] allNews = new NewsNode[totalNewsItem];
-
-                    for (int i = 0; i < totalNewsItem; i++) {
-                        JSONObject newsItem = result.getJSONObject(i);
-                        int newsId = newsItem.getInt("id");
-                        String source = newsItem.getString("source");
-                        String image = newsItem.getString("image");
-                        String href = newsItem.getString("href");
-                        String title = newsItem.getString("title");
-                        JSONArray similar = newsItem.getJSONArray("other");
-
-                        ArrayList other = new ArrayList();
-                        for (int j = 0; j < similar.length(); j++) {
-                            JSONObject newsObject = similar.getJSONObject(j);
-                            Pair newsPair = new Pair<>(newsObject.getString("href"), newsObject.getString("title"));
-                            other.add(newsPair);
-                        }
-                        allNews[i] = new NewsNode(newsId, title, image, href, source, other);
-                    }
-                    loadNews(allNews);
-                } catch (JSONException e) {
-                }
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response)
+            {
+                NewsNode [] allNews = footyUtils.constructNews(response);
+                loadNews(allNews);
             }
 
             @Override
@@ -116,8 +86,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_recommended) {
-            // Handle the camera action
+        if(id == R.id.nav_home)
+        {
+
+        }
+        if (id == R.id.nav_recommended)
+        {
+            Intent intent = new Intent(this,Recommendation.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

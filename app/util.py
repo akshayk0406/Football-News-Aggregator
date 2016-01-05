@@ -189,8 +189,8 @@ def compute_similarity(target_news_id,source_news_id):
 
 def get_news_object(record):
 
-	news_record				= {}
-	news_record['id']       = record[0]
+    news_record				= {}
+    news_record['id']       = record[0]
     news_record['fid'] 	    = record[1]
     news_record['source']   = record[2]
     news_record['title']    = record[3]
@@ -199,9 +199,9 @@ def get_news_object(record):
 
     return news_record
 
-def get_modifed_news_object(news_object):
-	
-	modified_news_object = {}
+def get_modified_news_object(news_object):
+
+    modified_news_object = {}
     if len(news_object) > 0:
         modified_news_object['source'] = news_object[0]['source']
         modified_news_object['title']  = news_object[0]['title']

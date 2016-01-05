@@ -65,7 +65,7 @@ def get_reco():
     conn        = get_db_connection()
     cursor      = conn.cursor()
     
-    records     = get_recommended_items(cursor,ipaddress) select(cursor,sql_query)
+    records     = get_recommended_items(cursor,ipaddress) 
     reco_news   = ""
 
     for record in records:
@@ -77,7 +77,15 @@ def get_reco():
         return make_response(json.dumps(response))
 
     response            = {'status':'OK','result':[]}
-    response['result']  = construct_news_from_id(cursor,reco_news)
+    
+    reco_news_tokens    = reco_news.split(",")
+    for reco_news in reco_news_tokens:
+        response['result'].append(construct_news_from_id(cursor,reco_news))
+
+    if 0 == len(response['result']):
+        response['result']  = get_landing_page_data(cursor)
+        response['result'].reverse()
+
     cursor.close()
     conn.close()
 

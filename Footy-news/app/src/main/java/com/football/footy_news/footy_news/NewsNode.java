@@ -1,9 +1,8 @@
-package com.football.footy_news;
+package com.football.footy_news.footy_news;
 
 /**
- * Created by akshaykulkarni on 1/3/16.
+ * Created by akshaykulkarni on 1/4/16.
  */
-
 import java.util.ArrayList;
 public class NewsNode
 {

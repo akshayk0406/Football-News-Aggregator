@@ -1,4 +1,4 @@
-package com.football.footy_news;
+package com.football.footy_news.footy_news;
 
 import org.junit.Test;
 

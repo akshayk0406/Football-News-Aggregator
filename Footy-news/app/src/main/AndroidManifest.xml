@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.football.footy_news">
+    package="com.football.footy_news.footy_news">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"

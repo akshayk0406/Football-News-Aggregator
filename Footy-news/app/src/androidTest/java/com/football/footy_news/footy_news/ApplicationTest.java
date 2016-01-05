@@ -1,4 +1,4 @@
-package com.football.footy_news;
+package com.football.footy_news.footy_news;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

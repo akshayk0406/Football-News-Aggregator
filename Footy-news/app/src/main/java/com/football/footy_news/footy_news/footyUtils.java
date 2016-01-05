@@ -1,5 +1,8 @@
-package com.football.footy_news;
+package com.football.footy_news.footy_news;
 
+/**
+ * Created by akshaykulkarni on 1/4/16.
+ */
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -8,11 +11,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 
-/**
- * Created by akshaykulkarni on 1/3/16.
- */
-public class footyUtils
-{
+public class footyUtils {
     private static footyUtils ourInstance   = new footyUtils();
     public static String hashKey            = "5Tde@7Wn$";
 

@@ -1,5 +1,8 @@
-package com.football.footy_news;
+package com.football.footy_news.footy_news;
 
+/**
+ * Created by akshaykulkarni on 1/4/16.
+ */
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;

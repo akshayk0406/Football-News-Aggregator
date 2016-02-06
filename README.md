@@ -10,3 +10,5 @@ Purpose of this project is to apply the concepts of data-mining in real world pr
 
 In addition to this I have also implmented collabrative filtering to recommend users relevant articles.
 
+Landing Page of API:- http://ec2-52-90-78-119.compute-1.amazonaws.com/
+
